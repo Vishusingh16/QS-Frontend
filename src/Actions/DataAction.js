@@ -1,5 +1,4 @@
 import axios from "axios";
-import Card from "../components/Card/Card";
 
 // Define action types as constants
 const DATA_REQUEST = "DATA_REQUEST";
@@ -8,81 +7,68 @@ const DATA_FAILURE = "DATA_FAILURE";
 const SELECT_DATA_REQUEST = "SELECT_DATA_REQUEST";
 const SELECT_DATA_SUCCESS = "SELECT_DATA_SUCCESS";
 const SELECT_DATA_FAILURE = "SELECT_DATA_FAILURE";
+
+// Fetch all data
 export const fetchAllData = () => async (dispatch) => {
+  dispatch({ type: DATA_REQUEST });
   try {
-    dispatch({ type: DATA_REQUEST });
-    const { data } = await axios.get(
-      "https://api.quicksell.co/v1/internal/frontend-assignment/"
-    );
+    const { data } = await axios.get("https://api.quicksell.co/v1/internal/frontend-assignment/");
     dispatch({ type: DATA_SUCCESS, payload: data });
-  } catch (error) {
+  } catch {
     dispatch({ type: DATA_FAILURE });
   }
 };
-export const selectData =
-  (group, allTickets, orderValue) => async (dispatch) => {
-    try {
-      dispatch({ type: SELECT_DATA_REQUEST });
-      let user = false;
-      let mySet = new Set();
-      let arr = [],
-        selectedData = [];
-      if (group === "status") {
-        allTickets.forEach((element) => {
-          mySet.add(element.status);
-        });
-        arr = [...mySet];
-        arr.forEach((element, index) => {
-          let arr = allTickets.filter((fElement) => {
-            return element === fElement.status;
-          });
-          selectedData.push({
-            [index]: {
-              title: element,
-              value: arr,
-            },
-          });
-        });
-      } else if (group === "user") {
-        user = true;
-        allTickets?.allUser?.forEach((element, index) => {
-          arr = allTickets?.allTickets?.filter((Felement) => {
-            return element.id === Felement.userId;
-          });
-          selectedData.push({
-            [index]: {
-              title: element.name,
-              value: arr,
-            },
-          });
-        });
-      } else {
-        let prior_list = ["No priority", "Urgent", "High", "Medium", "Low"];
-        prior_list.forEach((element, index) => {
-          arr = allTickets.filter((fElement) => {
-            return index === fElement.priority;
-          });
 
-          selectedData.push({
-            [index]: {
-              title: element,
-              value: arr,
-            },
-          });
-        });
-      }
-      if (orderValue === "title") {
-        selectedData.forEach((element, index) => {
-          element[index]?.value?.sort((a, b) => a.title.localeCompare(b.title));
-        });
-      }
-      if (orderValue === "priority") {
-        selectedData.forEach((element, index) => {
-          element[index]?.value?.sort((a, b) => b.priority - a.priority);
-        });
-      }
-      dispatch({ type: SELECT_DATA_SUCCESS, payload: { selectedData, user } });
-    } catch (error) {
-      dispatch({ type: SELECT_DATA_FAILURE, payload: error.message });
+// Group data by status, user, or priority, and apply sorting based on orderValue
+export const selectData = (group, allTickets, orderValue) => async (dispatch) => {
+  dispatch({ type: SELECT_DATA_REQUEST });
+  try {
+    let selectedData = [], groupData, user = false;
+
+    switch (group) {
+      case "status":
+        selectedData = groupBy(allTickets, "status");
+        break;
+      case "user":
+        user = true;
+        selectedData = allTickets?.allUser?.map((user, idx) => ({
+          [idx]: {
+            title: user.name,
+            value: allTickets.allTickets.filter(ticket => ticket.userId === user.id),
+          },
+        }));
+        break;
+      default:
+        const priorities = ["No priority", "Urgent", "High", "Medium", "Low"];
+        selectedData = priorities.map((priority, idx) => ({
+          [idx]: {
+            title: priority,
+            value: allTickets.filter(ticket => ticket.priority === idx),
+          },
+        }));
     }
-  };
+
+    if (orderValue) {
+      selectedData.forEach((group, idx) => {
+        group[idx]?.value?.sort((a, b) =>
+          orderValue === "title" ? a.title.localeCompare(b.title) : b.priority - a.priority
+        );
+      });
+    }
+
+    dispatch({ type: SELECT_DATA_SUCCESS, payload: { selectedData, user } });
+  } catch (error) {
+    dispatch({ type: SELECT_DATA_FAILURE, payload: error.message });
+  }
+};
+
+// Helper function to group data by a specific key
+const groupBy = (data, key) => {
+  const grouped = [...new Set(data.map(item => item[key]))].map((group, idx) => ({
+    [idx]: {
+      title: group,
+      value: data.filter(item => item[key] === group),
+    },
+  }));
+  return grouped;
+};
