@@ -9,10 +9,16 @@ This project is a React-based Kanban-board app developed to interact with the pr
 
 ## 🖥️ Tech Stack
 **Frontend:**  
-<img height="40" src="https://raw.githubusercontent.com/AnmolVerma404/AnmolVerma404/main/gif/css.webp" alt="CSS">  
-<img src="https://raw.githubusercontent.com/AnmolVerma404/AnmolVerma404/main/gif/js.webp" height="40" alt="JavaScript">  
-<img height="40" src="https://raw.githubusercontent.com/AnmolVerma404/AnmolVerma404/main/gif/react.webp" alt="React">  
-<img src="https://img.shields.io/badge/React_Router-CA4245?style=for-the-badge&logo=react-router&logoColor=white" alt="React Router">
+
+CSS: Used for styling and designing a clean, responsive interface for the Kanban board. CSS ensures the layout adapts well across different screen sizes and devices.
+JavaScript (JS): The core programming language used for building the interactivity of the application. JS enables dynamic content rendering and handling user inputs seamlessly.
+React: A popular JavaScript library for building user interfaces, especially single-page applications (SPAs). React allows efficient re-rendering of the board when tickets are added or modified, enhancing the user experience.
+React Router: Handles client-side navigation within the application. It enables smooth transitions between different views of the app (like ticket grouping or sorting) without refreshing the entire page.
+Axios: A promise-based HTTP client used to make API requests from the Quicksell API. Axios helps in fetching and managing the ticket data efficiently. It simplifies the process of sending requests, handling responses, and managing errors.
+API Interaction with Axios
+This project makes extensive use of Axios to interact with the API provided by Quicksell. Axios helps pull ticket data from the API, update ticket statuses, and group them dynamically on the Kanban board. With Axios, handling requests such as GET (fetching ticket details) and POST/PUT (updating ticket data) becomes straightforward, ensuring smooth communication with the backend.
+
+Axios was chosen for its ease of use, better error handling, and simpler syntax compared to the native fetch() API.
 
 ## Kanban-Board Preview 🙈 :
 
